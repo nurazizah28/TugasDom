@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Latihan DOM</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" 
+    integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar navbar-light bg-light">
+            <a class="navbar-brand">Mini Ecommerce</a>
+            <form class="form-inline" id="formItem">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" id="keyword" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="searchItem">Search</button>
+            </form>
+            <button class="btn btn-primary" id="cart" onclick="confirmClearCart()"><i class="fas fa-shopping-cart"></i>(<span id="cart-count">0</span>)</button>
+        </nav>
+        <div class="row" id="listBarang">
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <img src="img/logitek.jpg" class="card-img-top" alt="Keyboard Logitek" style="height: 200px; object-fit: contain;">
+                    <div class="card-body">
+                        <h5 class="card-title">Keyboard Logitek</h5>
+                        <p class="card-text">Keyboard yang mantap untuk kantoran.</p>
+                        <p class="card-text"><strong>Rp 600.000,00</strong></p>
+                        <button class="btn btn-primary" onclick="addToCart('Keyboard Logitek', 600000)">Add To Cart</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <img src="img/genius.jpeg" class="card-img-top" alt="Mouse genius" style="height: 200px; object-fit: contain;">
+                    <div class="card-body">
+                        <h5 class="card-title">Mouse Genius</h5>
+                        <p class="card-text">Mouse genius biar lebih pintar.</p>
+                        <p class="card-text"><strong>Rp 50.000,00</strong></p>
+                        <button class="btn btn-primary" onclick="addToCart('Mouse Genius', 50000)">Add To Cart</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <img src="img/jerry.jpg" class="card-img-top" alt="Mouse Jerry" style="height: 200px; object-fit: contain;">
+                    <div class="card-body">
+                        <h5 class="card-title">Mouse Jerry</h5>
+                        <p class="card-text">Mouse yang disukai kucing.</p>
+                        <p class="card-text"><strong>Rp 30.000,00</strong></p>
+                        <button class="btn btn-primary" onclick="addToCart('Mouse Jerry', 30000)">Add To Cart</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <img src="img/msi.jpg" class="card-img-top" alt="Keyboard MSI" style="height: 200px; object-fit: contain;">
+                    <div class="card-body">
+                        <h5 class="card-title">Keyboard MSI</h5>
+                        <p class="card-text">Keyboard gaming MSI mekanik.</p>
+                        <p class="card-text"><strong>Rp 300.000,00</strong></p>
+                        <button class="btn btn-primary" onclick="addToCart('Keyboard MSI', 300000)">Add To Cart</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Produk lain disini -->
+        </div>
+    </div>
+
+    <!-- Modal untuk menampilkan isi keranjang -->
+    <div class="modal fade" id="cartModal" tabindex="-1" role="dialog" aria-labelledby="cartModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cartModalLabel">Keranjang Belanja</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="cart-items">
+            <!-- Daftar produk dalam keranjang akan muncul di sini -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha384-tsQFQPCAfrk6NFHftJHKqtrC97RX0j5lUW4qd2Tq8o7pI6soH3yN6wbi9U0z17kT" 
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" 
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" 
+    crossorigin="anonymous"></script>
+
+    <script>
+        let cart = [];
+
+        function addToCart(productName, productPrice) {
+            // Tambahkan produk ke keranjang
+            cart.push({ name: productName, price: productPrice });
+            updateCartCount();
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: productName  + ' telah ditambahkan ke keranjang.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        function updateCartCount() {
+            // Update jumlah produk di keranjang
+            document.getElementById('cart-count').textContent = cart.length;
+        }
+
+        function showCart() {
+            // Tampilkan isi keranjang di modal
+            let cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = ''; // Kosongkan elemen sebelum menambahkan item
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p>Keranjang masih kosong.</p>';
+            } else {
+                cart.forEach((item, index) => {
+                    cartItems.innerHTML += `
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <p>${item.name} - Rp ${item.price.toLocaleString('id-ID')}</p>
+                            <button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">Hapus</button>
+                        </div>
+                    `;
+                });
+            }
+
+            $('#cartModal').modal('show');
+        }
+
+        function removeFromCart(index) {
+            // Hapus produk dari keranjang
+            cart.splice(index, 1);
+            updateCartCount();
+            showCart(); // Tampilkan ulang isi keranjang setelah menghapus
+        }
+
+        function clearCart() {
+            // Hapus semua produk dari keranjang
+            cart = [];
+            updateCartCount();
+            showCart(); // Tampilkan ulang isi keranjang setelah menghapus semua
+            Swal.fire({
+                icon: 'success',
+                title: 'Keranjang dikosongkan!',
+                text: 'Semua produk telah dihapus dari keranjang.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        function confirmClearCart() {
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: "Apakah Anda yakin ingin menghapus semua item dari keranjang?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus Semua',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    clearCart(); // Panggil fungsi untuk menghapus semua item
+                }
+            });
+        }
+
+        document.getElementById("formItem").addEventListener("submit", function (event) {
+            event.preventDefault(); // Mencegah form agar tidak melakukan submit default
+
+            var keyword = document.getElementById("keyword").value.toLowerCase();
+            var items = document.getElementById("listBarang").getElementsByClassName("col-md-3");
+
+            // Iterasi melalui semua produk dan tampilkan/hilangkan berdasarkan kecocokan dengan keyword
+            for (var i = 0; i < items.length; i++) {
+                var itemName = items[i].getElementsByClassName("card-title")[0].textContent.toLowerCase();
+                if (itemName.includes(keyword)) {
+                    items[i].style.display = "block"; // Tampilkan produk jika cocok
+                } else {
+                    items[i].style.display = "none"; // Sembunyikan produk jika tidak cocok
+                }
+            }
+        });
+    </script>
+</body>
+</html>
